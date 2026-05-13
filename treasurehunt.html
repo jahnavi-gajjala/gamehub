@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mystery Flip Game - Multiplayer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body {
+  background: url('https://www.transparenttextures.com/patterns/stardust.png'), radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+  background-size: cover;
+}
+.flip-card { perspective: 1200px; }
+.flip-card-inner { transition: transform 0.6s ease-in-out; transform-style: preserve-3d; position: relative; width: 200px; height: 260px; }
+.flipped .flip-card-inner { transform: rotateY(180deg); }
+.flip-card-front, .flip-card-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  position: absolute; width: 100%; height: 100%;
+  border-radius: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  padding: 1.5rem;
+  text-align: center;
+}
+.flip-card-front { background-color: #fff; color: #111; font-size: 2.5rem; }
+.flip-card-back { background-color: #10b981; color: white; transform: rotateY(180deg); flex-direction: column; gap: 0.75rem; font-size: 1.1rem; }
+.fade { filter: blur(4px) grayscale(0.3); pointer-events: none; opacity: 0.3; transition: all 0.3s ease-in-out; }
+.scoreboard { position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 1rem; border-radius: 1rem; max-height: 80vh; overflow-y: auto; width: 220px; }
+.player-score { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.player-score img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #10b981; }
+#my-panel { position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.6); padding: 1rem; border-radius: 1rem; width: 180px; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+#my-panel img { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #10b981; }
+.picked { border: 3px solid yellow; position: relative; }
+.picked img { position: absolute; width: 24px; height: 24px; border-radius: 50%; top: -12px; right: -12px; border: 2px solid white; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center text-white p-6 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400">
+
+<h1 class="text-4xl font-extrabold mb-6 text-center text-gray-700 animate-bounce">🎁 Mystery Box Game</h1>
+
+<div id="box-grid" class="grid grid-cols-10 gap-3 transition-all duration-500 mb-6"></div>
+<div id="overlay" class="fixed inset-0 flex items-center justify-center z-50 hidden"></div>
+
+<div class="scoreboard bg-white/90 backdrop-blur-lg text-gray-700">
+  <h2 class="font-bold text-lg mb-2">Scoreboard</h2>
+  <div id="score-list"></div>
+</div>
+
+<div id="my-panel" class="bg-white/90 backdrop-blur-lg ">
+  <h2 class="font-semibold text-white">You</h2>
+  <img id="my-avatar" src="https://api.dicebear.com/8.x/adventurer/svg?seed=default" alt="My Avatar">
+  <span id="my-name" class="font-semibold text-white"></span>
+</div>
+
+<script>
+const grid = document.getElementById("box-grid");
+const overlay = document.getElementById("overlay");
+const scoreList = document.getElementById("score-list");
+
+const roomCode = localStorage.getItem("room_code");
+const myUsername = localStorage.getItem("username");
+const myAvatar = localStorage.getItem("playerAvatar") || `https://api.dicebear.com/8.x/adventurer/svg?seed=${encodeURIComponent(myUsername)}`;
+
+// const categories = [
+//   { type: "Money", emoji: "💰", description: "You won some money! 🎉" },
+//   { type: "Joker", emoji: "🃏", description: "You got a joker card! Use it wisely." },
+//   { 
+//     type: "Gift", emoji: "🎁",
+//     options: [
+//       { name: "Slap", desc: "Give a playful slap to someone!" },
+//       { name: "Hug", desc: "Give a warm hug to a friend!" }
+//     ]
+//   },
+//   {
+//     type: "Task", emoji: "📜",
+//     options: [
+//       { name: "Dancing", desc: "Do a funny dance move." },
+//       { name: "Singing", desc: "Sing your favorite song." },
+//       { name: "Imitate Someone", desc: "Imitate a famous person." },
+//       { name: "Funny Pose", desc: "Strike a funny pose." },
+//       { name: "Dialogue", desc: "Say a funny dialogue." }
+//     ]
+//   }
+// ];
+
+// Define category templates
+const TASKS = [
+  { name: "Dancing", desc: "Do a funny dance move." },
+  { name: "Singing", desc: "Sing your favorite song." },
+  { name: "Imitate Someone", desc: "Imitate a famous person." },
+  { name: "Funny Pose", desc: "Strike a funny pose." },
+  { name: "Dialogue", desc: "Say a funny dialogue." }
+];
+
+const GIFTS = [
+  { name: "Slap", desc: "Give a playful slap to someone!" },
+  { name: "Hug", desc: "Give a warm hug to a friend!" }
+];
+
+// Create 100-box category array
+let boxCategories = [];
+
+// 70 Tasks
+for(let i=0; i<70; i++){
+  boxCategories.push({ type: "Task", emoji: "📜", options: TASKS });
+}
+
+// 10 Gifts
+for(let i=0; i<10; i++){
+  boxCategories.push({ type: "Gift", emoji: "🎁", options: GIFTS });
+}
+
+// 10 Joker
+for(let i=0; i<10; i++){
+  boxCategories.push({ type: "Joker", emoji: "🃏", description: "You got a joker card! Use it wisely." });
+}
+
+// 10 Money
+for(let i=0; i<10; i++){
+  boxCategories.push({ type: "Money", emoji: "💰", description: "You won some money! 🎉" });
+}
+
+// Shuffle array randomly
+// Proper shuffle function
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Shuffle the 100 boxes
+boxCategories = shuffleArray(boxCategories);
+
+
+
+function randomChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+let players = [];
+let boxSelections = {};
+
+async function loadPlayersAndPicks(){
+  try {
+    // Get players from DB
+    const res = await fetch(`get_players.php?room_code=${roomCode}`);
+    const data = await res.json();
+    if(!data.success) return;
+
+    players = data.players.map(p => ({
+      username: p.username,
+      avatar_url: p.avatar_url && p.avatar_url.trim()!=="" ? p.avatar_url : (p.username===myUsername ? myAvatar : `https://api.dicebear.com/8.x/adventurer/svg?seed=${encodeURIComponent(p.username)}`),
+      scores: {
+        Money: p.scores?.Money||0,
+        Joker: p.scores?.Joker||0,
+        Gift: p.scores?.Gift||0,
+        Task: p.scores?.Task||0
+      }
+    }));
+    updateScoreboard();
+    updateMyPanel();
+
+    // Get picks
+    const picksRes = await fetch(`get_picks.php?room_code=${roomCode}`);
+    const picksData = await picksRes.json();
+    if(picksData.success && picksData.picks){
+      boxSelections = {};
+      picksData.picks.forEach(pick=>{
+        boxSelections[pick.box_number] = { player: pick.username, avatar: pick.avatar_url || (pick.username===myUsername ? myAvatar : `https://api.dicebear.com/8.x/adventurer/svg?seed=${encodeURIComponent(pick.username)}`), category: pick.category };
+      });
+      highlightPickedBoxes();
+    }
+
+  }catch(err){ console.error(err); }
+}
+
+function updateScoreboard(){
+  scoreList.innerHTML="";
+  players.forEach(p=>{
+    const div=document.createElement("div");
+    div.className="player-score";
+    
+    // Make sure we have a valid avatar URL
+    let avatarUrl = p.avatar_url;
+    if(!avatarUrl || avatarUrl === "undefined" || avatarUrl.trim() === "") {
+      avatarUrl = `https://api.dicebear.com/8.x/adventurer/svg?seed=${encodeURIComponent(p.username)}`;
+    }
+    
+    div.innerHTML=`<img src="${avatarUrl}" alt="${p.username}"><span>${p.username}: Money ${p.scores.Money}, Joker ${p.scores.Joker}, Gift ${p.scores.Gift}, Task ${p.scores.Task}</span>`;
+    scoreList.appendChild(div);
+  });
+}
+
+function updateMyPanel(){
+  const me=players.find(p=>p.username===myUsername);
+  if(me){
+    // Make sure we have a valid avatar URL
+    let avatarUrl = me.avatar_url;
+    if(!avatarUrl || avatarUrl === "undefined" || avatarUrl.trim() === "") {
+      avatarUrl = myAvatar || `https://api.dicebear.com/8.x/adventurer/svg?seed=${encodeURIComponent(myUsername)}`;
+    }
+    
+    document.getElementById("my-avatar").src = avatarUrl;
+    document.getElementById("my-name").textContent = me.username;
+  }
+}
+
+function highlightPickedBoxes(){
+  for(const boxNum in boxSelections){
+    const btn=document.querySelector(`button[data-num='${boxNum}']`);
+    if(btn){
+      btn.classList.add("picked");
+      btn.innerHTML=`<span>${boxNum}</span><img src="${boxSelections[boxNum].avatar}" alt="picker">`;
+    }
+  }
+}
+
+function allPlayersPickedFirstRound(){
+  return players.every(p => Object.values(boxSelections).some(b => b.player===p.username));
+}
+
+// Create 100 boxes
+for(let i=1;i<=100;i++){
+  const box=document.createElement("button");
+  box.className="bg-white text-black font-semibold w-12 h-12 rounded shadow hover:bg-yellow-300 transition";
+  box.textContent=i;
+  box.dataset.num=i;
+
+  box.addEventListener("click", async ()=>{
+    if(boxSelections[i]) return;
+    
+    // Check if all players completed their first pick
+    const myPicksCount = Object.values(boxSelections).filter(b => b.player === myUsername).length;
+    const playerPicksByUser = {};
+    players.forEach(p => {
+      playerPicksByUser[p.username] = Object.values(boxSelections).filter(b => b.player === p.username).length;
+    });
+    
+    // Calculate the current round
+    const minPicks = Math.min(...Object.values(playerPicksByUser));
+    const currentRound = minPicks + 1;
+    
+    // Make sure player isn't trying to pick out of turn
+    if(myPicksCount >= currentRound) {
+      return alert("Please wait for all players to complete their current round!");
+    }
+    
+   const category = boxCategories[i-1]; // i is 1-based index for boxes 1–100
+
+    let title, description;
+    if(category.options){
+      const option=randomChoice(category.options);
+      title=`${category.emoji} ${category.type}: ${option.name}`;
+      description=option.desc;
+    } else {
+      title=`${category.emoji} ${category.type}`;
+      description=category.description;
+    }
+
+    overlay.innerHTML=`<div class="flip-card" id="card"><div class="flip-card-inner"><div class="flip-card-front">${i}</div><div class="flip-card-back"><h2>${title}</h2><p>${description}</p></div></div></div>`;
+    overlay.classList.remove("hidden");
+    setTimeout(()=>document.getElementById("card").classList.add("flipped"),300);
+
+    // Save pick to DB
+    try{
+      const response = await fetch("save_pick.php", {
+        method:"POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body:`room_code=${encodeURIComponent(roomCode)}&username=${encodeURIComponent(myUsername)}&box_number=${i}&category=${encodeURIComponent(category.type)}&avatar_url=${encodeURIComponent(myAvatar)}`
+      });
+      
+      const result = await response.json();
+      
+      if(!result.success) {
+        alert(result.message);
+      } else {
+        await loadPlayersAndPicks();
+      }
+    }catch(err){ console.error(err); }
+
+    overlay.addEventListener("click", ()=>{
+      overlay.classList.add("hidden");
+    },{once:true});
+  });
+
+  grid.appendChild(box);
+}
+
+loadPlayersAndPicks();
+setInterval(loadPlayersAndPicks,3000);
+
+</script>
+</body>
+</html>

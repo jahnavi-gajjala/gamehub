@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CodePlay | Choose Avatar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Fredoka One', cursive; }
+    .avatar-option { transition: transform 0.2s, border 0.2s; cursor: pointer; }
+    .avatar-option:hover { transform: scale(1.1); }
+    .avatar-option.selected { border: 4px solid #fbbf24; }
+    .avatar-grid {
+      max-height: 400px; /* Scroll area */
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center text-white px-4 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 "
+     >
+
+  <h1 class="text-3xl font-bold text-yellow-300 mb-6">🎭 Choose Your Avatar</h1>
+
+  <!-- Name input -->
+  <div class="mb-6 w-full max-w-sm">
+    <label class="block text-lg mb-2">Enter Your Name</label>
+    <input id="username" type="text" 
+           class="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400" 
+           placeholder="Your name here..." />
+  </div>
+
+  <!-- Avatar choices (scrollable) -->
+  <div id="avatar-list" class="avatar-grid grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-4 mb-6 w-full max-w-4xl"></div>
+
+  <button onclick="saveAndProceed()" 
+          class="bg-green-500 hover:bg-green-600 px-6 py-3 text-white font-bold rounded-full transition-all duration-300">
+    🚀 Continue
+  </button>
+
+  <script>
+    const avatarList = document.getElementById("avatar-list");
+
+    // Generate 50 different avatar seeds
+    const avatarSeeds = Array.from({length: 50}, (_, i) => `Avatar${i + 1}`);
+
+    let selectedAvatar = null;
+
+    avatarSeeds.forEach(seed => {
+      const img = document.createElement("img");
+      img.src = `https://api.dicebear.com/8.x/adventurer/svg?seed=${seed}`;
+      img.className = "avatar-option w-20 h-20 rounded-full border-2 border-gray-400";
+      img.onclick = () => {
+        document.querySelectorAll(".avatar-option").forEach(a => a.classList.remove("selected"));
+        img.classList.add("selected");
+        selectedAvatar = img.src;
+      };
+      avatarList.appendChild(img);
+    });
+
+    function saveAndProceed() {
+      const username = document.getElementById("username").value.trim();
+
+      if (!username) {
+        alert("⚠️ Please enter your name.");
+        return;
+      }
+
+      if (!selectedAvatar) {
+        alert("⚠️ Please select an avatar.");
+        return;
+      }
+
+      // Save details to localStorage
+      localStorage.setItem("username", username);
+      localStorage.setItem("playerAvatar", selectedAvatar);
+
+      // Redirect to create/join room page
+      window.location.href = "playwithfriends.html";
+    }
+  </script>
+
+</body>
+</html>

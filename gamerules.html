@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Game Rules - Mystery Box Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: url('https://www.transparenttextures.com/patterns/stardust.png'),
+        radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      background-size: cover;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center text-white p-6">
+
+  <div class="max-w-2xl bg-white bg-opacity-10 backdrop-blur-md rounded-xl p-8 shadow-2xl text-white">
+    <h1 class="text-4xl font-bold mb-6 text-center">📜 Game Rules</h1>
+
+    <ol class="list-decimal list-inside space-y-4 text-lg leading-relaxed">
+      <li>There are <strong>100 mystery boxes</strong> numbered 1 to 100.</li>
+      <li>Click on any box number to select it.</li>
+      <li>Tasks may include: 💰 Money, 🃏 Joker, 🎁 Gift, 📜 Task</li>
+      <li>Once a box is opened, it cannot be selected again.</li>
+      <li>Only one box can be opened at a time — other boxes will blur out temporarily.</li>
+      <li>If u got money it will be ignored</li>
+      <li>If u got joker u can change task in the next round if u dont like</li>
+      <li>If u got gift u will get slap or hug from your friend</li>
+      <li>If u got task u need to perform the given task</li>
+      <li>Click anywhere to return to the game after viewing a task.</li>
+    </ol>
+
+    <div class="mt-8 text-center">
+      <a href="setup_tables.php" class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded transition">
+         Start Game
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

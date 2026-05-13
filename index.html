@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    .card-hover:hover {
+      transform: translateY(-10px);
+      transition: all 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 min-h-screen flex flex-col items-center">
+
+  <!-- Hero Section -->
+  <header class="w-full text-center py-16">
+    <h1 class="text-6xl font-GreatVibes text-white mb-4 animate-bounce">Game Hub</h1>
+    <p class="text-white text-xl mb-6">Your ultimate platform for fun and learning!</p>
+  </header>
+
+  <!-- Games Section -->
+  <main class="w-full max-w-6xl px-4 pb-16">
+    <h2 class="text-4xl font-bold text-white mb-10 text-center">Our Games</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
+
+      <!-- Game 1 Dummy -->
+      <div class="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-10 flex flex-col items-center justify-center card-hover">
+        <h3 class="text-2xl font-bold mb-4 text-purple-700">Treasure Hunt</h3>
+        <a href="avatar.html"><p class="text-gray-700 text-center">Uncover surprises, complete fun tasks, and become the ultimate Treasure Hunter!</p></a>
+      </div>
+
+      <!-- Game 2 Dummy -->
+      <div class="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-10 flex flex-col items-center justify-center card-hover">
+        <h3 class="text-2xl font-bold mb-4 text-purple-700">Emoji Fun Movie Vibes</h3>
+        <a href="emojimovie.html"> <p class="text-gray-700 text-center">Your favorite telugu movies hidden in emojis!</p></a>
+      </div>
+
+      <!-- Game 3 Dummy -->
+      <div class="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-10 flex flex-col items-center justify-center card-hover">
+        <h3 class="text-2xl font-bold mb-4 text-purple-700">Riddle Challenges</h3>
+        <a href="riddlechallenge.html"><p class="text-gray-700 text-center">Twist your mind,guess the answer! </p></a>
+      </div>
+
+      <!-- Game 4 Dummy -->
+      <div class="bg-white bg-opacity-80 backdrop-blur-md rounded-3xl shadow-2xl p-10 flex flex-col items-center justify-center card-hover">
+        <h3 class="text-2xl font-bold mb-4 text-purple-700">Test Your Luck</h3>
+       <a href="testyourluck.html"><p class="text-gray-700 text-center">Showcase your talent!</p></a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-6 text-white">
+    &copy; MADE WITH LOVE By JAANU AND NANDU ❤️
+  </footer>
+
+  <!-- Decorative Circles -->
+  <div class="absolute top-0 left-0 w-40 h-40 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-pulse"></div>
+  <div class="absolute bottom-10 right-10 w-60 h-60 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse"></div>
+  <div class="absolute top-20 right-20 w-32 h-32 bg-yellow-300 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-pulse"></div>
+
+</body>
+</html>

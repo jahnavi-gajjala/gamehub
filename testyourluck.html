@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Random Task Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 animate-gradient-x">
+
+  <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-8 shadow-2xl w-full max-w-lg text-center border border-white/30">
+    <h1 class="text-3xl font-bold text-indigo-700 mb-6">🎲 Random Task Game</h1>
+
+    <div class="mb-6">
+      <button id="generateBtn" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg text-xl">Generate Number</button>
+    </div>
+
+    <div class="mb-4">
+      <span class="text-lg font-semibold text-slate-700">Number:</span>
+      <span id="numberBox" class="ml-2 text-3xl font-bold text-indigo-600">-</span>
+    </div>
+
+    <div class="mb-4">
+      <span class="text-lg font-semibold text-slate-700">Task:</span>
+      <div id="taskBox" class="mt-2 text-2xl font-bold text-emerald-600 min-h-[50px]">-</div>
+    </div>
+
+    <div>
+      <span class="text-slate-500 text-sm">Each number corresponds to a fun task!</span>
+    </div>
+  </div>
+
+  <script>
+    const tasks = [
+      "Singing 🎤",
+      "Dancing 💃",
+      "Dialogue",
+      "Imitate anyone 🎭",
+      "Do a funny pose 🤪"
+    ];
+
+    // Generate array of valid numbers (1 to 80, excluding 53 and 66)
+    const validNumbers = Array.from({ length: 80 }, (_, i) => i + 1).filter(n => n !== 53 && n !== 66);
+
+    const generateBtn = document.getElementById("generateBtn");
+    const numberBox = document.getElementById("numberBox");
+    const taskBox = document.getElementById("taskBox");
+
+    generateBtn.addEventListener("click", () => {
+      // Pick a random number from the filtered list
+      const randomNumber = validNumbers[Math.floor(Math.random() * validNumbers.length)];
+
+      // Get corresponding task using modulo
+      const task = tasks[(randomNumber - 1) % tasks.length];
+
+      numberBox.textContent = randomNumber;
+      taskBox.textContent = task;
+
+      // Animate pulse
+      taskBox.classList.add("animate-pulse");
+      setTimeout(() => taskBox.classList.remove("animate-pulse"), 800);
+    });
+  </script>
+
+</body>
+</html>

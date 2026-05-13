@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Riddle Challenge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          keyframes: {
+            'gradient-x': {
+              '0%,100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            shake: {
+              '0%,100%': { transform: 'translateX(0)' },
+              '20%': { transform: 'translateX(-8px)' },
+              '40%': { transform: 'translateX(8px)' },
+              '60%': { transform: 'translateX(-6px)' },
+              '80%': { transform: 'translateX(6px)' },
+            },
+            glow: {
+              '0%,100%': { boxShadow: '0 0 0px rgba(34,197,94,0)' },
+              '50%': { boxShadow: '0 0 25px rgba(34,197,94,0.7)' },
+            }
+          },
+          animation: {
+            'gradient-x': 'gradient-x 10s ease infinite',
+            shake: 'shake 0.6s ease-in-out',
+            glow: 'glow 1s ease-in-out',
+          }
+        }
+      }
+    }
+  </script>
+  <style>body{background-size:200% 200%;}</style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400  animate-gradient-x">
+
+  <div class="w-full max-w-2xl bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 text-center border border-white/30">
+    <h1 class="text-3xl font-bold mb-4 text-indigo-700">🧩 Riddle Challenge</h1>
+
+    <div class="flex justify-between items-center mb-6 text-lg font-semibold text-slate-700">
+      <div>Score: <span id="score" class="text-emerald-600 font-bold">0</span></div>
+      <div>Streak: <span id="streak" class="text-indigo-600 font-bold">0</span></div>
+      <div>Riddle <span id="roundNum">1</span>/<span id="totalRounds">50</span></div>
+    </div>
+
+    <div id="emojiBox" class="text-xl md:text-2xl leading-relaxed mb-6">Loading…</div>
+
+    <input id="guessInput" type="text" placeholder="Type your answer…" 
+      class="w-full text-xl px-5 py-3 rounded-2xl border-2 border-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-300 mb-4 text-center" />
+
+    <div class="flex flex-wrap justify-center gap-4 mb-4">
+      <button id="checkBtn" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg transform transition hover:scale-105">Check</button>
+      <button id="skipBtn" class="px-6 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl shadow-lg transform transition hover:scale-105">Skip</button>
+      <button id="hintBtn" class="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-black rounded-xl shadow-lg transform transition hover:scale-105">Hint (<span id="hintsLeft">2</span>)</button>
+    </div>
+
+    <div id="status" class="min-h-[40px] text-lg font-semibold"></div>
+    <div id="hintBox" class="mt-2 text-slate-700 text-base bg-slate-100 px-4 py-2 rounded-xl">Tap Hint to reveal letters</div>
+  </div>
+
+  <script>
+    // EASY first 25, TOUGH next 25
+    const RIDDLES = [
+      // --- EASY 25 ---
+      { q: "What has keys but can’t open locks?", a: ["piano","keyboard"] },
+      { q: "What has hands but can’t clap?", a: ["clock"] },
+      { q: "What has a neck but no head?", a: ["bottle"] },
+      { q: "What gets wetter the more it dries?", a: ["towel"] },
+      { q: "What belongs to you but is used more by others?", a: ["name"] },
+      { q: "What has one eye but can’t see?", a: ["needle"] },
+      { q: "What has a ring but no finger?", a: ["phone","bell"] },
+      { q: "What has a thumb and four fingers but isn’t alive?", a: ["glove"] },
+      { q: "What kind of band never plays music?", a: ["rubber band"] },
+      { q: "What building has the most stories?", a: ["library"] },
+      { q: "What invention lets you look through walls?", a: ["window"] },
+      { q: "What has four wheels and flies?", a: ["garbage truck","dustcart"] },
+      { q: "What kind of room has no doors or windows?", a: ["mushroom"] },
+      { q: "What word gets shorter when you add two letters?", a: ["short"] },
+      { q: "What kind of tree can you carry in your hand?", a: ["palm"] },
+      { q: "What can be cracked, made, told, and played?", a: ["joke"] },
+      { q: "What has ears but cannot hear?", a: ["corn"] },
+      { q: "What can travel the world but stays in a corner?", a: ["stamp"] },
+      { q: "What month has 28 days?", a: ["all","all months"] },
+      { q: "What goes up and down but doesn’t move?", a: ["stairs"] },
+      { q: "What runs around a yard but never moves?", a: ["fence"] },
+      { q: "What has a head and a tail but no body?", a: ["coin"] },
+      { q: "What comes at the end of everything?", a: ["g","letter g"] },
+      { q: "What has one head, one foot, four legs?", a: ["bed"] },
+      { q: "What disappears when you stand in front of it?", a: ["shadow"] },
+
+      // --- TOUGH 25 ---
+      { q: "I speak without a mouth, hear without ears. What am I?", a: ["echo"] },
+      { q: "The more you take away, the bigger I get. What am I?", a: ["hole"] },
+      { q: "I’m always hungry and must be fed. What am I?", a: ["fire"] },
+      { q: "The more you have of me, the less you see. What am I?", a: ["darkness"] },
+      { q: "Forward I am heavy, backward I am not. What am I?", a: ["ton"] },
+      { q: "What comes once in a year, twice in a week, never in a day?", a: ["e","letter e"] },
+      { q: "What word is pronounced the same if you remove four of its five letters?", a: ["queue"] },
+      { q: "I shave every day but my beard stays the same. Who am I?", a: ["barber"] },
+      { q: "What runs but never walks, has a bed but never sleeps?", a: ["river"] },
+      { q: "What gets sharper the more you use it, but duller if you don’t?", a: ["brain","mind"] },
+      { q: "What disappears the moment you say its name?", a: ["silence"] },
+      { q: "The more you share me, the less I am. What am I?", a: ["secret"] },
+      { q: "What has cities but no houses, forests but no trees, water but no fish?", a: ["map"] },
+      { q: "What has 13 hearts but no organs?", a: ["deck of cards","cards"] },
+      { q: "What can you keep after giving it to someone else?", a: ["your word","promise"] },
+      { q: "What begins with T, ends with T, and has T inside?", a: ["teapot"] },
+      { q: "The more you use me, the shorter I become. What am I?", a: ["pencil","eraser","candle"] },
+      { q: "What has an end but no beginning?", a: ["stick","rope"] },
+      { q: "What comes down but never goes up?", a: ["rain"] },
+      { q: "What can’t talk but replies when spoken to?", a: ["echo"] },
+      { q: "What can fly without wings, cry without eyes?", a: ["cloud","wind"] },
+      { q: "I’m full of holes but I can hold water. What am I?", a: ["sponge"] },
+      { q: "What gets broken without being touched?", a: ["promise"] },
+      { q: "What disappears when you look straight at it?", a: ["dream","mirage"] }
+    ];
+
+    const el = id => document.getElementById(id);
+    const norm = s => s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+
+    let current=0, score=0, streak=0, hints=0;
+    el("totalRounds").textContent = RIDDLES.length;
+
+    function updateScore(){el("score").textContent=score;el("streak").textContent=streak;}
+
+    function loadRiddle(){
+      if(current>=RIDDLES.length){
+        el("emojiBox").textContent="🏆🎉 You solved all riddles!";
+        el("status").innerHTML=`Game Over! Final Score: <b>${score}</b>`;
+        document.querySelectorAll("button").forEach(b=>b.disabled=true);
+        return;
+      }
+      let r=RIDDLES[current];
+      el("emojiBox").textContent=r.q;
+      el("roundNum").textContent=current+1;
+      el("guessInput").value="";
+      el("status").textContent="";
+      el("hintBox").textContent="Tap Hint to reveal letters";
+      hints=0; el("hintsLeft").textContent=2;
+      el("guessInput").focus();
+    }
+
+    function check(){
+      let g=norm(el("guessInput").value);
+      if(!g)return;
+      let ans=RIDDLES[current].a.map(norm);
+      if(ans.includes(g)){
+        score+=10; streak++;
+        el("status").textContent="✅ Correct!";
+        el("emojiBox").classList.add("animate-glow");
+        setTimeout(()=>el("emojiBox").classList.remove("animate-glow"),900);
+        current++; updateScore(); setTimeout(loadRiddle,800);
+      } else {
+        el("status").textContent="❌ Wrong!";
+        el("emojiBox").classList.add("animate-shake");
+        setTimeout(()=>el("emojiBox").classList.remove("animate-shake"),600);
+        streak=0; updateScore();
+      }
+    }
+
+    function skip(){
+      el("status").innerHTML="⏭️ Skipped! Answer: <b>"+RIDDLES[current].a[0]+"</b>";
+      streak=0; current++; updateScore(); setTimeout(loadRiddle,1200);
+    }
+
+    function hint(){
+      if(hints>=2){el("hintBox").textContent="No hints left!";return;}
+      let ans=RIDDLES[current].a[0]; hints++;
+      el("hintsLeft").textContent=2-hints;
+      el("hintBox").textContent=ans.slice(0,hints*2)+"…";
+    }
+
+    el("checkBtn").onclick=check;
+    el("skipBtn").onclick=skip;
+    el("hintBtn").onclick=hint;
+    el("guessInput").addEventListener("keydown",e=>{if(e.key==="Enter")check();});
+
+    loadRiddle(); updateScore();
+  </script>
+</body>
+</html>

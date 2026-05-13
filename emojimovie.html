@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emoji Telugu Movie Guess</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          keyframes: {
+            'gradient-x': {
+              '0%,100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            shake: {
+              '0%,100%': { transform: 'translateX(0)' },
+              '20%': { transform: 'translateX(-8px)' },
+              '40%': { transform: 'translateX(8px)' },
+              '60%': { transform: 'translateX(-6px)' },
+              '80%': { transform: 'translateX(6px)' },
+            },
+            glow: {
+              '0%,100%': { boxShadow: '0 0 0px rgba(34,197,94,0)' },
+              '50%': { boxShadow: '0 0 25px rgba(34,197,94,0.7)' },
+            }
+          },
+          animation: {
+            'gradient-x': 'gradient-x 8s ease infinite',
+            shake: 'shake 0.6s ease-in-out',
+            glow: 'glow 1s ease-in-out',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 animate-gradient-x">
+
+  <div class="w-full max-w-2xl bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 text-center border border-white/30">
+    <div class="flex justify-between items-center mb-6 text-lg font-semibold text-slate-700">
+      <div>Score: <span id="score" class="text-emerald-600 font-bold">0</span></div>
+      <div>Streak: <span id="streak" class="text-indigo-600 font-bold">0</span></div>
+      <div>Round <span id="roundNum">1</span>/<span id="totalRounds">50</span></div>
+    </div>
+
+    <div id="emojiBox" class="text-8xl mb-6 animate-bounce">🎬🤔</div>
+
+    <input id="guessInput" type="text" placeholder="Type movie name..." 
+      class="w-full text-xl px-5 py-3 rounded-2xl border-2 border-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-300 mb-4 text-center" />
+
+    <div class="flex flex-wrap justify-center gap-4 mb-4">
+      <button id="checkBtn" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg transform transition hover:scale-105">Check</button>
+      <button id="skipBtn" class="px-6 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl shadow-lg transform transition hover:scale-105">Skip</button>
+      <button id="hintBtn" class="px-6 py-3 bg-amber-400 hover:bg-amber-500 text-black rounded-xl shadow-lg transform transition hover:scale-105">Hint (<span id="hintsLeft">2</span>)</button>
+    </div>
+
+    <div id="status" class="min-h-[40px] text-lg font-semibold"></div>
+    <div id="hintBox" class="mt-4 text-slate-700 text-base bg-slate-100 px-4 py-2 rounded-xl">Tap Hint to reveal letters</div>
+  </div>
+
+  <script>
+    const PUZZLES = [
+      { emoji: "🏰⚔️👑", answers: ["baahubali"] },
+      { emoji: "🔥🚂🇮🇳", answers: ["rrr"] },
+      { emoji: "🌲🌼🔥", answers: ["pushpa"] },
+      { emoji: "💔👨‍⚕️🩸", answers: ["arjun reddy"] },
+      { emoji: "🏠🎩💰", answers: ["ala vaikunthapurramuloo"] },
+      { emoji: "🏇⚔️👻", answers: ["magadheera"] },
+      { emoji: "🪰🧑‍🔬💥", answers: ["eega"] },
+      { emoji: "🎭👑🖋️", answers: ["mahanati"] },
+      { emoji: "🏏👕🎟️", answers: ["jersey"] },
+      { emoji: "🕵️‍♂️🔫💥", answers: ["pokiri"] },
+      { emoji: "👮‍♂️🕶️🎭", answers: ["gabbar singh"] },
+      { emoji: "🕺🎩💥", answers: ["duvvada jagannadham"] },
+      { emoji: "🏹🔥💪", answers: ["sarrainodu"] },
+      { emoji: "👨‍👦❤️📚", answers: ["nannaku prematho"] },
+      { emoji: "🌾💃❤️", answers: ["fidaa"] },
+      { emoji: "🏫👫🎓", answers: ["happy days"] },
+      { emoji: "🏠🎠💑", answers: ["bommarillu"] },
+      { emoji: "👨‍🎓💃❤️", answers: ["geetha govindam"] },
+      { emoji: "🌊🌾❤️", answers: ["uppena"] },
+      { emoji: "👵📱🎞️", answers: ["oh baby"] },
+      { emoji: "🏍️💥🔥", answers: ["mass"] },
+      { emoji: "🧠🎓🎉", answers: ["jathiratnalu"] },
+      { emoji: "🕵️‍♂️📜🧩", answers: ["agent sai srinivasa athreya"] },
+      { emoji: "👮‍♂️🎖️💥", answers: ["sarileru neekevvaru"] },
+      { emoji: "🎨📷❤️", answers: ["color photo"] },
+      { emoji: "📬💌📱", answers: ["mail"] },
+      { emoji: "🏞️💘🎭", answers: ["krishna and his leela"] },
+      { emoji: "🚜🌾👨‍🌾", answers: ["sreekaram"] },
+      { emoji: "🎨💔🎬", answers: ["rang de"] },
+      { emoji: "🤐🎤🖤", answers: ["nishabdham"] },
+      { emoji: "🎥🎞️🎬", answers: ["cinemabandi"] },
+      { emoji: "💻💰🎭", answers: ["mosagallu"] },
+      { emoji: "🧟‍♂️🧠🎮", answers: ["zombie reddy"] },
+      { emoji: "👨‍⚖️📚⚖️", answers: ["vakeel saab"] },
+      { emoji: "⏳🕵️‍♂️💔", answers: ["kshana kshanam"] },
+      { emoji: "🧑‍🦽🎭💫", answers: ["oopiri"] },
+      { emoji: "💍🎥💘", answers: ["pelli choopulu"] },
+      { emoji: "💰🎤🎬", answers: ["paisa vasool"] },
+      { emoji: "👑🎯🎬", answers: ["raja the great"] },
+      { emoji: "🏇💥🎯", answers: ["race gurram"] },
+      { emoji: "🎉🎂🎁", answers: ["shatamanam bhavati"] },
+      { emoji: "🏎️💨🎯", answers: ["speedunnodu"] },
+      { emoji: "🏠🌸👨‍👩‍👧‍👦", answers: ["seethamma vaakitlo sirimalle chettu"] },
+      { emoji: "🕵️‍♂️🕷️💥", answers: ["spyder"] },
+      { emoji: "🎭🎶🔥", answers: ["rangasthalam"] },
+      { emoji: "🦸‍♂️⚡🌩️", answers: ["shiva"] },
+      { emoji: "🌇🏙️💔", answers: ["premam"] },
+      { emoji: "🧑‍🎤🎹🎶", answers: ["ok bangaram"] },
+      { emoji: "👩‍❤️‍👨🌿🎶", answers: ["ok kanmani"] }
+    ];
+
+    const el = id => document.getElementById(id);
+    const normalize = s => s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+
+    let current = 0, score = 0, streak = 0, hintsUsed = 0;
+    const totalRounds = PUZZLES.length;
+    el("totalRounds").textContent = totalRounds;
+
+    function updateScore() {
+      el("score").textContent = score;
+      el("streak").textContent = streak;
+    }
+
+    function loadPuzzle() {
+      if (current >= PUZZLES.length) {
+        el("emojiBox").textContent = "🏆🎉";
+        el("status").innerHTML = `Game Over! Final Score: <b>${score}</b>`;
+        document.querySelectorAll("button").forEach(b => b.disabled = true);
+        return;
+      }
+      const p = PUZZLES[current];
+      el("emojiBox").textContent = p.emoji;
+      el("roundNum").textContent = current + 1;
+      el("guessInput").value = "";
+      el("status").textContent = "";
+      el("hintBox").textContent = "Tap Hint to reveal letters";
+      hintsUsed = 0;
+      el("hintsLeft").textContent = 2;
+    }
+
+    function checkAnswer() {
+      const guess = normalize(el("guessInput").value);
+      if (!guess) return;
+      const answers = PUZZLES[current].answers.map(normalize);
+      if (answers.includes(guess)) {
+        score += 10; streak++;
+        el("status").textContent = "✅ Correct!";
+        el("emojiBox").classList.add("animate-glow");
+        setTimeout(()=>el("emojiBox").classList.remove("animate-glow"),1000);
+        current++;
+        updateScore();
+        setTimeout(loadPuzzle, 1000);
+      } else {
+        el("status").textContent = "❌ Wrong!";
+        el("emojiBox").classList.add("animate-shake");
+        setTimeout(()=>el("emojiBox").classList.remove("animate-shake"),600);
+        streak = 0;
+        updateScore();
+      }
+    }
+
+    function skipPuzzle() {
+      el("status").innerHTML = "⏭️ Skipped! Answer: <b>" + PUZZLES[current].answers[0] + "</b>";
+      streak = 0;
+      current++;
+      updateScore();
+      setTimeout(loadPuzzle, 1500);
+    }
+
+    function showHint() {
+      if (hintsUsed >= 2) {
+        el("hintBox").textContent = "No hints left!";
+        return;
+      }
+      const ans = PUZZLES[current].answers[0];
+      hintsUsed++;
+      el("hintsLeft").textContent = 2 - hintsUsed;
+      el("hintBox").textContent = ans.slice(0, hintsUsed*2) + "...";
+    }
+
+    el("checkBtn").onclick = checkAnswer;
+    el("skipBtn").onclick = skipPuzzle;
+    el("hintBtn").onclick = showHint;
+    el("guessInput").addEventListener("keyup", e => { if (e.key==="Enter") checkAnswer(); });
+
+    loadPuzzle();
+    updateScore();
+  </script>
+</body>
+</html>
