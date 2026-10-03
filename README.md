@@ -1,55 +1,46 @@
 # GameHub 🎮
 
-GameHub is an interactive gaming platform designed to provide users with a fun, engaging, and competitive gaming experience.
-The platform includes multiplayer features, game rooms, leaderboards, interactive UI elements, and real-time gameplay functionality.
+An interactive multiplayer gaming platform focused on rooms, player interaction, score tracking, and real-time gameplay.
 
-## 🚀 Features
+## Overview
 
-* 🎮 Multiplayer gaming experience
-* 👥 Create and join game rooms
-* 🏆 Leaderboard system
-* ⚡ Real-time gameplay updates
-* 👤 Player profiles and avatars
-* 🔊 Interactive sound effects
-* 📱 Responsive design for all devices
-* 🌐 Attractive and user-friendly interface
+GameHub provides a centralized web experience where users can create or join game rooms, interact with other players, and track scores through a leaderboard.
 
-## 🛠️ Technologies Used
+## Key Features
 
-* HTML
-* CSS
-* Tailwind CSS
-* JavaScript
-* PHP
-* MySQL
-* Firebase
+- Multiplayer game rooms
+- Create and join rooms
+- Player profiles and avatars
+- Real-time gameplay updates
+- Score tracking
+- Leaderboards
+- Responsive UI
+- Interactive sound and UI elements
 
-## 📌 Project Objective
+## Tech Stack
 
-The goal of GameHub is to create a centralized platform where users can enjoy multiplayer games, connect with friends, and experience interactive gaming with modern web technologies.
+- HTML
+- CSS
+- Tailwind CSS
+- JavaScript
+- PHP
+- MySQL
+- Firebase
 
-## 🎯 Core Functionalities
+## Project Focus
 
-* User authentication system
-* Room creation and joining
-* Real-time player synchronization
-* Score tracking system
-* Multiplayer game management
-* Interactive UI animations
+The project demonstrates web application development, authentication flows, database integration, room management, and real-time application behavior.
 
-## 🔥 Future Enhancements
+## Future Improvements
 
-* More multiplayer games
-* Global ranking system
-* In-game chat feature
-* AI-based opponents
-* Mobile application support
-* Voice communication system
+- More multiplayer games
+- Global rankings
+- In-game chat
+- AI opponents
+- Mobile application support
+- Voice communication
 
-## 👩‍💻 Developed By
+## Contributors
 
-**Jahnavi and Nanditha**
+Jahnavi Gajjala and Nanditha
 
----
-
-⭐ Star this repository if you like the project!
