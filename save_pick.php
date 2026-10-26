@@ -1,20 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "u331876870_gamehub";
-$password = "7262143@Sana";
-$dbname = "u331876870_gamehub";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-  echo json_encode([
-    "success" => false,
-    "message" => "DB connection failed"
-  ]);
-  exit;
-}
+require __DIR__ . '/database.php';
+$conn = gamehub_db();
 
 $room_code = $_POST['room_code'] ?? '';
 $username = $_POST['username'] ?? '';
