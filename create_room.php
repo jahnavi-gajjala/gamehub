@@ -1,10 +1,6 @@
 <?php
-$servername = "sql300.infinityfree.com";
-$username = "if0_39858511";
-$password = "ccccAgVUGgQcpNI";
-$dbname = "if0_39858511_treasure_hunt";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
+require __DIR__ . '/database.php';
+$conn = gamehub_db();
 
 if ($conn->connect_error) {
     echo json_encode([
@@ -29,7 +25,7 @@ if (!$tableExists) {
         `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
         PRIMARY KEY (`room_code`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-    
+
     if (!$conn->query($createTable)) {
         echo json_encode([
             "success" => false,
