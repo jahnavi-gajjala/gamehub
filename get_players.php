@@ -1,13 +1,6 @@
 <?php
-$servername = "sql300.infinityfree.com";
-$username = "if0_39858511";
-$password = "ccccAgVUGgQcpNI";
-$dbname = "if0_39858511_treasure_hunt";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-  die(json_encode(["success" => false, "error" => "DB connection failed."]));
-}
+require __DIR__ . '/database.php';
+$conn = gamehub_db();
 
 $room_code = $_GET['room_code'] ?? '';
 
@@ -19,19 +12,19 @@ if (empty($room_code)) {
 // ✅ Fetch players for this room
 $sql = "SELECT p.username, p.avatar_url, p.role,
         COALESCE(
-          (SELECT COUNT(*) FROM player_picks 
+          (SELECT COUNT(*) FROM player_picks
            WHERE username = p.username AND room_code = p.room_code AND category = 'Money'), 0
         ) AS money_score,
         COALESCE(
-          (SELECT COUNT(*) FROM player_picks 
+          (SELECT COUNT(*) FROM player_picks
            WHERE username = p.username AND room_code = p.room_code AND category = 'Joker'), 0
         ) AS joker_score,
         COALESCE(
-          (SELECT COUNT(*) FROM player_picks 
+          (SELECT COUNT(*) FROM player_picks
            WHERE username = p.username AND room_code = p.room_code AND category = 'Gift'), 0
         ) AS gift_score,
         COALESCE(
-          (SELECT COUNT(*) FROM player_picks 
+          (SELECT COUNT(*) FROM player_picks
            WHERE username = p.username AND room_code = p.room_code AND category = 'Task'), 0
         ) AS task_score
         FROM players p WHERE p.room_code = ? ORDER BY p.id ASC LIMIT 100";
