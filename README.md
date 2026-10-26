@@ -1,46 +1,52 @@
 # GameHub 🎮
 
-An interactive multiplayer gaming platform focused on rooms, player interaction, score tracking, and real-time gameplay.
+A multiplayer web platform for creating game rooms, playing with others, and tracking scores through live leaderboards.
 
 ## Overview
 
-GameHub provides a centralized web experience where users can create or join game rooms, interact with other players, and track scores through a leaderboard.
+GameHub brings together room-based interaction, player profiles, and real-time score updates in one responsive web experience.
 
-## Key Features
+## Features
 
-- Multiplayer game rooms
-- Create and join rooms
-- Player profiles and avatars
-- Real-time gameplay updates
-- Score tracking
+- Create and join multiplayer rooms
+- Player profiles and avatar selection
+- Real-time gameplay and score updates
 - Leaderboards
-- Responsive UI
 - Interactive sound and UI elements
+- Responsive interface
 
-## Tech Stack
+## Tech stack
 
-- HTML
-- CSS
-- Tailwind CSS
-- JavaScript
-- PHP
-- MySQL
-- Firebase
+| Layer | Technology |
+| --- | --- |
+| Frontend | HTML, CSS, Tailwind CSS, JavaScript |
+| Backend | PHP |
+| Database | MySQL |
+| Real-time data | Firebase |
 
-## Project Focus
+## Local setup
 
-The project demonstrates web application development, authentication flows, database integration, room management, and real-time application behavior.
+1. Start **Apache** and **MySQL** in XAMPP.
+2. Clone or copy the repository into the XAMPP `htdocs` folder.
+3. Import the project SQL file into phpMyAdmin/MySQL, if included.
+4. Configure Firebase credentials in the relevant project file.
+5. Visit `http://localhost/<project-folder>`.
 
-## Future Improvements
+## Skills demonstrated
 
-- More multiplayer games
-- Global rankings
-- In-game chat
-- AI opponents
-- Mobile application support
-- Voice communication
+- Full-stack web application development
+- Authentication and user-management flows
+- Database-backed room and score handling
+- Firebase-driven real-time interactions
+- Responsive, interactive UI design
 
-## Contributors
+## Roadmap
 
-Jahnavi Gajjala and Nanditha
+- Add additional multiplayer games
+- Add in-game chat and global rankings
+- Add AI opponents and accessibility options
+- Improve mobile support
 
+## Team
+
+Built by **Jahnavi Gajjala and Nanditha**.
