@@ -1,13 +1,6 @@
 <?php
-$servername = "sql300.infinityfree.com";
-$username = "if0_39858511";
-$password = "ccccAgVUGgQcpNI";
-$dbname = "if0_39858511_treasure_hunt";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-  die(json_encode(["success" => false, "error" => "DB connection failed."]));
-}
+require __DIR__ . '/database.php';
+$conn = gamehub_db();
 
 $room_code = $_GET['room_code'] ?? '';
 
@@ -17,10 +10,10 @@ if (empty($room_code)) {
 }
 
 // ✅ Fetch picks for this room
-$sql = "SELECT p.username, p.box_number, p.category, pl.avatar_url 
-        FROM player_picks p 
-        LEFT JOIN players pl ON p.username = pl.username AND p.room_code = pl.room_code 
-        WHERE p.room_code = ? 
+$sql = "SELECT p.username, p.box_number, p.category, pl.avatar_url
+        FROM player_picks p
+        LEFT JOIN players pl ON p.username = pl.username AND p.room_code = pl.room_code
+        WHERE p.room_code = ?
         ORDER BY p.id ASC";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $room_code);
