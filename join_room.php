@@ -1,12 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
-$servername = "sql300.infinityfree.com";
-$username = "if0_39858511";
-$password = "ccccAgVUGgQcpNI";
-$dbname = "if0_39858511_treasure_hunt";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
+require __DIR__ . '/database.php';
+$conn = gamehub_db();
 
 if ($conn->connect_error) {
     echo json_encode([
@@ -27,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result && $result->num_rows > 0) {
         $tableExists = true;
     }
-    
+
     if (!$tableExists) {
         // Create rooms table if it doesn't exist
         $createTable = "CREATE TABLE `rooms` (
@@ -36,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
             PRIMARY KEY (`room_code`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-        
+
         if (!$conn->query($createTable)) {
             echo json_encode([
                 "success" => false,
@@ -44,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             exit;
         }
-        
+
         // Create the room automatically
         $stmt = $conn->prepare("INSERT INTO rooms (room_code, created_by) VALUES (?, ?)");
         $stmt->bind_param("ss", $roomCode, $username);
@@ -60,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Room doesn't exist, create it
             $stmt = $conn->prepare("INSERT INTO rooms (room_code, created_by) VALUES (?, ?)");
             $stmt->bind_param("ss", $roomCode, $username);
-            
+
             if (!$stmt->execute()) {
                 echo json_encode([
                     "success" => false,
@@ -77,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result && $result->num_rows > 0) {
         $tableExists = true;
     }
-    
+
     if (!$tableExists) {
         // Create players table if it doesn't exist
         $createTable = "CREATE TABLE `players` (
@@ -90,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             PRIMARY KEY (`id`),
             KEY `room_code` (`room_code`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
-        
+
         if (!$conn->query($createTable)) {
             echo json_encode([
                 "success" => false,
@@ -99,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
-    
+
     // Save player into players table
     $stmt = $conn->prepare("INSERT INTO players (room_code, username, avatar_url, role) VALUES (?, ?, ?, ?)");
     $avatar = $_POST['avatar_url'] ?? '';
